@@ -1,0 +1,40 @@
+# Python environment
+python-dotenv>=1.0.0
+pydantic-settings>=2.1.0
+
+# API & Web Framework
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.5.0
+streamlit>=1.38.0
+httpx>=0.27.0
+
+# Document Processing
+PyMuPDF>=1.24.0
+python-docx>=1.1.0
+
+# Text Processing & Chunking
+langchain-text-splitters>=0.3.0
+tiktoken>=0.7.0  # token-based chunk length measurement
+
+# Embeddings & Vector DB
+qdrant-client>=1.12.0
+google-genai>=1.0.0
+
+# Ranking & Retrieval
+sentence-transformers>=3.0.0
+rank-bm25>=0.2.2
+numpy>=1.24.0
+
+# Evaluation
+ragas>=0.2.0
+datasets>=2.14.7
+
+# Utilities
+requests>=2.31.0
+tqdm>=4.66.0
+
+# Development (optional)
+pytest>=7.4.0
+black>=23.12.0
+ruff>=0.5.0

@@ -1,0 +1,66 @@
+# AnthraSync — full local stack: Qdrant + API + Streamlit UI.
+#
+#   docker compose up --build            # start everything
+#   docker compose up -d qdrant          # just the vector DB (for local dev)
+#
+# Qdrant: the api service automatically reaches the bundled qdrant container at
+# qdrant:6333 (overriding .env's localhost). To use Qdrant Cloud instead, set
+# QDRANT_URL + QDRANT_API_KEY in .env and remove the override on the api service.
+
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: anthrasync_qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: anthrasync_api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # Override .env's localhost so the container reaches Qdrant by service name.
+      - QDRANT_URL=http://qdrant:6333
+    volumes:
+      # Persist the BM25 index, feedback log, and ingestion artifacts.
+      - ./data:/app/data
+      # Cache the HuggingFace reranker model so it downloads ONCE (not per boot).
+      - hf_cache:/root/.cache/huggingface
+    depends_on:
+      - qdrant
+    command: uvicorn src.api.main:app --host 0.0.0.0 --port 8000
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      # Generous grace: the ~1GB reranker model downloads on the FIRST boot.
+      # After that it's cached in hf_cache and startup is fast.
+      start_period: 600s
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: anthrasync_ui
+    ports:
+      - "8501:8501"
+    environment:
+      # Reach the API by its compose service name (not localhost).
+      - API_HOST=api
+      - API_PORT=8000
+    depends_on:
+      api:
+        condition: service_healthy
+    command: streamlit run app.py --server.port 8501 --server.address 0.0.0.0
+
+volumes:
+  qdrant_storage:
+  hf_cache:

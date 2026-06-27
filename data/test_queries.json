@@ -1,0 +1,141 @@
+{
+  "metadata": {
+    "description": "Test queries for Enterprise Knowledge Assistant evaluation",
+    "version": "1.0",
+    "total_queries": 15,
+    "categories": {
+      "direct_factual": 5,
+      "cross_document": 3,
+      "ambiguous": 2,
+      "out_of_scope": 2,
+      "edge_cases": 3
+    }
+  },
+  "test_cases": [
+    {
+      "id": "T01",
+      "category": "direct_factual",
+      "question": "What is the employee leave policy?",
+      "expected_answer_contains": ["24 paid leaves annually", "2 days per month"],
+      "expected_source": "HR_Policy.txt",
+      "difficulty": "easy"
+    },
+    {
+      "id": "T02",
+      "category": "direct_factual",
+      "question": "What is the refund policy?",
+      "expected_answer_contains": ["30 days", "original purchase date", "original packaging"],
+      "expected_source": "Customer_Policy.txt",
+      "difficulty": "easy"
+    },
+    {
+      "id": "T03",
+      "category": "direct_factual",
+      "question": "How many sick days do employees get per year?",
+      "expected_answer_contains": ["12 sick days", "medical certificate", "3 consecutive working days"],
+      "expected_source": "HR_Policy.txt",
+      "difficulty": "easy"
+    },
+    {
+      "id": "T04",
+      "category": "direct_factual",
+      "question": "What are the AcmeCloud resource tiers and pricing?",
+      "expected_answer_contains": ["Starter", "Basic", "Professional", "Enterprise", "$25", "$99", "$399"],
+      "expected_source": "Technical_Guide.txt",
+      "difficulty": "medium"
+    },
+    {
+      "id": "T05",
+      "category": "direct_factual",
+      "question": "What is the password policy?",
+      "expected_answer_contains": ["14 characters", "90 days", "12 passwords", "1Password"],
+      "expected_source": "Compliance_Guidelines.txt",
+      "difficulty": "easy"
+    },
+    {
+      "id": "T06",
+      "category": "cross_document",
+      "question": "Compare the refund policy and the return policy. What are the key differences?",
+      "expected_answer_contains": ["refund", "return", "30 days", "RMA"],
+      "expected_source": "Customer_Policy.txt",
+      "difficulty": "hard",
+      "notes": "Tests multi-section reasoning within one document"
+    },
+    {
+      "id": "T07",
+      "category": "cross_document",
+      "question": "What security measures protect both customer data and employee data?",
+      "expected_answer_contains": ["AES-256", "TLS", "encrypted"],
+      "expected_sources": ["Customer_Policy.txt", "Compliance_Guidelines.txt"],
+      "difficulty": "hard",
+      "notes": "Tests cross-document reasoning across customer and compliance docs"
+    },
+    {
+      "id": "T08",
+      "category": "cross_document",
+      "question": "What are all the ways I can contact support at ACME?",
+      "expected_answer_contains": ["email", "phone", "Slack", "chat"],
+      "expected_sources": ["Customer_Policy.txt", "Company_FAQ.txt"],
+      "difficulty": "medium",
+      "notes": "Support channels are mentioned in multiple documents"
+    },
+    {
+      "id": "T09",
+      "category": "ambiguous",
+      "question": "Tell me about the policies",
+      "expected_behavior": "Should ask for clarification or provide a general overview covering HR, customer, and compliance policies",
+      "difficulty": "medium",
+      "notes": "Tests handling of vague/ambiguous queries"
+    },
+    {
+      "id": "T10",
+      "category": "ambiguous",
+      "question": "How does the system work?",
+      "expected_behavior": "Should either ask for clarification or provide AcmeCloud architecture overview",
+      "difficulty": "medium",
+      "notes": "Ambiguous — could refer to any system"
+    },
+    {
+      "id": "T11",
+      "category": "out_of_scope",
+      "question": "What is the meaning of life?",
+      "expected_behavior": "Should respond with 'I don't have enough information in the knowledge base to answer that'",
+      "difficulty": "easy",
+      "notes": "Tests hallucination prevention — completely off-topic"
+    },
+    {
+      "id": "T12",
+      "category": "out_of_scope",
+      "question": "What is the stock price of ACME Corporation?",
+      "expected_behavior": "Should respond that this information is not in the knowledge base",
+      "difficulty": "easy",
+      "notes": "Plausible but not in any document"
+    },
+    {
+      "id": "T13",
+      "category": "edge_case",
+      "question": "",
+      "expected_behavior": "Should handle gracefully — return error or ask for a question",
+      "difficulty": "easy",
+      "notes": "Empty question test"
+    },
+    {
+      "id": "T14",
+      "category": "edge_case",
+      "question": "What is the overtime pay rate and how does it relate to the holiday schedule? Also, can I work remotely during holidays?",
+      "expected_answer_contains": ["1.5x", "2x", "weekends", "remote"],
+      "expected_source": "HR_Policy.txt",
+      "difficulty": "hard",
+      "notes": "Tests multi-part question handling"
+    },
+    {
+      "id": "T15",
+      "category": "edge_case",
+      "question": "If I get a performance rating of 2, what happens next and how long do I have to improve before I might be terminated?",
+      "expected_answer_contains": ["Performance Improvement Plan", "PIP", "90-day", "termination"],
+      "expected_source": "HR_Policy.txt",
+      "difficulty": "medium",
+      "notes": "Tests reasoning chain: rating → PIP → consequences"
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+ACME CORPORATION — FREQUENTLY ASKED QUESTIONS
+Last Updated: January 2025
+Internal Knowledge Base
+
+========================================
+GENERAL COMPANY QUESTIONS
+========================================
+
+Q: What are the company's office locations?
+A: ACME Corporation has offices in three locations:
+   - Headquarters: 100 Innovation Drive, San Francisco, CA 94105
+   - Engineering Hub: 200 Tech Boulevard, Austin, TX 78701
+   - Sales Office: 50 Commerce Street, New York, NY 10001
+
+Q: What is the company's mission statement?
+A: ACME Corporation's mission is "To empower businesses through innovative cloud technology that simplifies complexity and accelerates growth."
+
+Q: How do I contact the IT Help Desk?
+A: The IT Help Desk can be reached at:
+   - Email: it-helpdesk@acme-corp.com
+   - Phone: ext. 4357 (HELP)
+   - Slack: #it-support channel
+   - Hours: Monday-Friday, 8 AM - 7 PM EST
+   For urgent issues outside business hours, call the emergency IT line: 1-800-ACME-911.
+
+Q: What is the employee referral bonus?
+A: Employees who successfully refer a candidate receive a $3,000 referral bonus. The bonus is paid in two installments: $1,500 after the referred employee's 30th day, and $1,500 after their 90th day. There is no limit on the number of referrals.
+
+========================================
+HR & BENEFITS QUESTIONS
+========================================
+
+Q: When is the open enrollment period for health insurance?
+A: Open enrollment occurs annually from November 1 to November 30. Changes take effect on January 1 of the following year. New hires can enroll within 30 days of their start date.
+
+Q: How do I update my emergency contact information?
+A: Log into the ACME HR Portal at hr.acme-corp.com, navigate to "My Profile" > "Emergency Contacts." You can add up to 3 emergency contacts. Updates take effect immediately.
+
+Q: Can I change my 401(k) contribution at any time?
+A: Yes, you can adjust your 401(k) contribution percentage at any time through the benefits portal. Changes take effect in the next pay cycle. Remember, the company matches dollar-for-dollar up to 6% of your base salary.
+
+Q: How do I submit an expense report?
+A: Submit expense reports through the ACME Expense Portal at expenses.acme-corp.com. Attach receipts for all expenses over $25. Reports must be submitted within 30 days of the expense. Reimbursement is processed within 10 business days of approval.
+
+Q: What holidays does the company observe?
+A: ACME Corporation observes the following paid holidays:
+   - New Year's Day (January 1)
+   - Martin Luther King Jr. Day (3rd Monday of January)
+   - Presidents' Day (3rd Monday of February)
+   - Memorial Day (Last Monday of May)
+   - Independence Day (July 4)
+   - Labor Day (1st Monday of September)
+   - Thanksgiving Day (4th Thursday of November)
+   - Day After Thanksgiving (Friday)
+   - Christmas Eve (December 24)
+   - Christmas Day (December 25)
+   Total: 10 paid holidays per year.
+
+========================================
+PRODUCT & TECHNICAL QUESTIONS
+========================================
+
+Q: What is the maximum file upload size on AcmeCloud?
+A: The default maximum file upload size is 100MB per file. Enterprise tier customers can increase this to 5GB per file. For large datasets, use the AcmeCloud CLI bulk upload feature.
+
+Q: How do I reset my AcmeCloud API key?
+A: Go to cloud.acme-corp.com > Settings > API Keys. Click "Regenerate" next to the key you want to reset. The old key is immediately invalidated. Update your applications with the new key before regenerating.
+
+Q: Does AcmeCloud support multi-region deployment?
+A: Yes, AcmeCloud supports deployment across 8 regions: US-East, US-West, EU-West, EU-Central, Asia-Pacific (Singapore), Asia-Pacific (Tokyo), South America (São Paulo), and Middle East (Dubai). Enterprise customers can request additional regions.
+
+Q: What programming languages does AcmeCloud support?
+A: AcmeCloud natively supports Python, Java, Node.js, Go, Ruby, and .NET. Custom runtimes can be used through Docker containers. Buildpacks are available for automatic detection and configuration.
+
+Q: What is the AcmeCloud uptime SLA?
+A: AcmeCloud guarantees 99.9% uptime for Professional and Enterprise tiers. The free and basic tiers have a 99.5% uptime target but no SLA guarantee. See the Customer Policy for SLA credit details.
+
+========================================
+SECURITY & COMPLIANCE QUESTIONS
+========================================
+
+Q: Is AcmeCloud SOC 2 compliant?
+A: Yes, AcmeCloud has achieved SOC 2 Type II certification. Our latest audit report is available to enterprise customers upon request. We also comply with GDPR, HIPAA (with BAA), and ISO 27001.
+
+Q: How is data encrypted on AcmeCloud?
+A: All data is encrypted at rest using AES-256 encryption. Data in transit is protected by TLS 1.3. Customer-managed encryption keys (CMEK) are available for enterprise customers through integration with AWS KMS or HashiCorp Vault.
+
+Q: What is the data backup policy?
+A: AcmeCloud performs automated daily backups with 30-day retention for all database services. Point-in-time recovery is available for the last 7 days. Enterprise customers can configure custom backup schedules and extend retention up to 365 days.
+
+Q: What happens to my data if I cancel my subscription?
+A: Upon cancellation, your data is retained for 30 days in a read-only state, during which you can export it. After 30 days, all data is permanently and irrevocably deleted from our systems. You will receive email reminders at 7 days and 1 day before deletion.
+
+========================================
+END OF FAQ
+========================================

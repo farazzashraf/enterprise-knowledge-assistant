@@ -1,0 +1,144 @@
+ACME CORPORATION — COMPLIANCE & INFORMATION SECURITY GUIDELINES
+Version 1.5 | Effective: January 2025
+Chief Information Security Officer (CISO) Office
+
+========================================
+TABLE OF CONTENTS
+========================================
+
+1. Information Classification
+2. Access Control
+3. Data Handling Procedures
+4. Incident Response
+5. Acceptable Use Policy
+6. Third-Party Risk Management
+7. Training & Awareness
+
+========================================
+1. INFORMATION CLASSIFICATION
+========================================
+
+1.1 Classification Levels
+All company information must be classified into one of four levels:
+
+PUBLIC: Information intended for public consumption (marketing materials, press releases, published product documentation).
+
+INTERNAL: Information for internal use only. Not sensitive but not for external sharing. Examples: internal newsletters, general procedures, org charts.
+
+CONFIDENTIAL: Sensitive business information that could harm the company if disclosed. Examples: financial reports, strategic plans, customer lists, unreleased product details.
+
+RESTRICTED: Highly sensitive information with legal or regulatory implications. Examples: personal data (PII), payment card data, health records, trade secrets, source code.
+
+1.2 Labeling Requirements
+All documents must be labeled with their classification level. Digital documents: include classification in the header or footer. Emails containing CONFIDENTIAL or RESTRICTED information must include the classification in the subject line prefix: [CONFIDENTIAL] or [RESTRICTED].
+
+========================================
+2. ACCESS CONTROL
+========================================
+
+2.1 Principle of Least Privilege
+Employees are granted the minimum level of access required to perform their job functions. Access reviews are conducted quarterly by department managers. Unused accounts are disabled after 60 days of inactivity.
+
+2.2 Password Policy
+Passwords must be at least 14 characters long. Passwords must include a mix of uppercase, lowercase, numbers, and special characters. Passwords expire every 90 days. The last 12 passwords cannot be reused. Use of a company-approved password manager (1Password) is mandatory.
+
+2.3 Multi-Factor Authentication
+MFA is required for:
+  - All remote access connections (VPN)
+  - Access to RESTRICTED and CONFIDENTIAL systems
+  - Administrative console access
+  - Email access from non-company devices
+
+========================================
+3. DATA HANDLING PROCEDURES
+========================================
+
+3.1 Data Storage
+RESTRICTED data must only be stored on encrypted, company-managed devices or approved cloud services. Personal devices (BYOD) may not store RESTRICTED data. USB drives and external storage devices are prohibited for CONFIDENTIAL and RESTRICTED data.
+
+3.2 Data Transfer
+RESTRICTED data may only be transmitted over encrypted channels (TLS 1.2 or higher). Email attachments containing RESTRICTED data must use the company's encrypted email system. File sharing of CONFIDENTIAL or RESTRICTED data must use the approved ACME ShareDrive platform, not personal cloud storage services.
+
+3.3 Data Disposal
+Paper documents containing CONFIDENTIAL or RESTRICTED data must be cross-shredded. Digital media must be securely wiped using NIST 800-88 compliant methods. Hard drives are physically destroyed at end-of-life. Data disposal records must be maintained for 3 years.
+
+========================================
+4. INCIDENT RESPONSE
+========================================
+
+4.1 Reporting Security Incidents
+All security incidents must be reported immediately to the Security Operations Center (SOC):
+  Email: security@acme-corp.com
+  Phone: ext. 7233 (SAFE)
+  Slack: #security-incidents (24/7 monitoring)
+
+4.2 Incident Classification
+P1 (Critical): Active data breach, ransomware, system compromise — response within 15 minutes
+P2 (High): Suspected unauthorized access, malware detection — response within 1 hour
+P3 (Medium): Policy violation, phishing attempt blocked — response within 4 hours
+P4 (Low): Informational, potential vulnerability report — response within 24 hours
+
+4.3 Incident Response Steps
+1. CONTAIN: Isolate affected systems to prevent spread
+2. ASSESS: Determine scope, impact, and root cause
+3. NOTIFY: Inform relevant stakeholders and, if required by law, affected individuals
+4. REMEDIATE: Fix the vulnerability and restore services
+5. REVIEW: Conduct post-incident review within 5 business days
+6. DOCUMENT: File incident report with lessons learned
+
+4.4 Breach Notification
+In the event of a confirmed data breach involving personal data:
+  - Legal counsel must be notified within 1 hour
+  - Affected individuals must be notified within 72 hours (GDPR requirement)
+  - Regulatory bodies must be notified as required by jurisdiction
+  - The CEO and Board of Directors must be briefed within 24 hours
+
+========================================
+5. ACCEPTABLE USE POLICY
+========================================
+
+5.1 Company Devices
+Company-issued devices are for business use. Limited personal use is permitted but must not interfere with work. All software must be approved and installed through the company software catalog. Jailbreaking or rooting devices is prohibited.
+
+5.2 Internet Use
+Internet access is filtered for security purposes. The following categories are blocked: malware distribution sites, gambling, adult content, unauthorized file sharing. VPN bypass tools and proxy services are prohibited.
+
+5.3 Email Use
+Business email must not be used for personal communications. Attachments from unknown senders should not be opened. Report suspicious emails using the "Report Phishing" button in Outlook. Auto-forwarding company email to personal accounts is prohibited.
+
+========================================
+6. THIRD-PARTY RISK MANAGEMENT
+========================================
+
+6.1 Vendor Assessment
+All vendors with access to company data must undergo a security assessment before engagement. Assessments evaluate: data handling practices, security certifications, incident response capabilities, and financial stability.
+
+6.2 Vendor Classification
+Critical Vendors: Access to RESTRICTED data or critical systems — annual on-site audit required
+High-Risk Vendors: Access to CONFIDENTIAL data — annual questionnaire and SOC 2 review
+Standard Vendors: INTERNAL data access only — initial assessment, biennial review
+
+6.3 Contractual Requirements
+All vendor contracts must include:
+  - Data protection clauses
+  - Right-to-audit provisions
+  - Breach notification requirements (within 24 hours)
+  - Data return and destruction clauses upon termination
+  - Insurance requirements ($5M minimum cyber liability)
+
+========================================
+7. TRAINING & AWARENESS
+========================================
+
+7.1 Security Awareness Training
+All employees must complete annual security awareness training within 30 days of onboarding and annually thereafter. Training covers phishing, social engineering, password hygiene, data classification, and incident reporting. Training completion is tracked and reported to department managers.
+
+7.2 Phishing Simulations
+The security team conducts monthly phishing simulations. Employees who click on simulated phishing links are enrolled in additional training. Three failures within 12 months trigger a review with the employee's manager.
+
+7.3 Role-Based Training
+Developers must complete secure coding training (OWASP Top 10) annually. System administrators must complete infrastructure security training. Managers must complete data handling and privacy training. New employees receive security orientation on their first day.
+
+========================================
+END OF DOCUMENT
+========================================
