@@ -199,19 +199,22 @@ information" message and `sources` is empty.
 
 ## 5. How It Avoids Making Things Up (safety nets)
 
-On this set of documents, the system's confidence scores for questions it *can*
-answer and ones it *can't* sometimes overlap — so one cutoff alone isn't reliable.
-The primary defense is now the **grounded prompt**, with a confidence floor kept
-as a backstop:
+The system measures how confident it is using the re-checker's own relevance
+score for the best matching passage — a number from 0 to 1, where off-topic
+questions score near 0 and clean factual hits score near 1. Two nets work
+together: a deterministic confidence floor and a grounded prompt.
 
-1. **Strict instructions (primary):** the agent is told to answer **only** from
-   the passages the search tool returned, and to reply with *exactly* "I don't
-   have enough information in the knowledge base to answer that." whenever they
-   don't actually contain the answer.
-2. **Confidence backstop:** if a search *did* run but came back essentially
-   empty/irrelevant (top re-rank score below the floor), the system overrides the
-   answer with the "not enough information" message — a deterministic guard
-   against answering on near-random retrieval.
+1. **Confidence floor:** the re-checker (`bge-reranker-base`) already gives each
+   passage a 0–1 relevance probability. If the best passage scores below the
+   floor (**0.10**), the search came back essentially empty/irrelevant and the
+   system overrides the answer with the "not enough information" message — a
+   deterministic guard against answering on near-random or out-of-scope queries.
+2. **Strict instructions:** the agent is also told to answer **only** from the
+   passages the search tool returned, and to reply with *exactly* "I don't have
+   enough information in the knowledge base to answer that." whenever they don't
+   actually contain the answer. This backs up the floor on the few tricky cases
+   whose scores still overlap (a genuinely answerable edge-case can score just
+   below an out-of-scope one).
 
 Because the agent decides whether to search at all, casual chat (greetings,
 thanks) is answered directly and never triggers either net. Together these refuse
@@ -224,7 +227,7 @@ ones.
 
 | Part | Choice | Why |
 |-------|--------|-----|
-| Language | Python 3.13 | Best ecosystem for this kind of AI work. |
+| Language | Python 3.11+ | Best ecosystem for this kind of AI work. |
 | AI model | Gemini 2.5 Flash | Fast, cheap, handles lots of text; easy to swap out. |
 | Fingerprints | Gemini `embedding-2` (768 numbers, L2-normalized, task-instruction prefixes) | High-quality, made by the same provider. |
 | Meaning search | Qdrant (Cloud) | Very fast search, saves to disk, managed option available. |
@@ -329,10 +332,14 @@ or paid tier is a one-line change.
    rewrite the search query, and turns the confidence floor into a backstop. Built
    on native `google-genai` function calling (no LangChain) — one tool, lightweight
    app, full control. Trade-off: ~2 model calls per factual question.
-7. **Two anti-hallucination nets** — a strict grounded prompt (answer only from the
-   passages, else a fixed refusal) as the primary net, plus a low confidence floor
-   (0.50) as a backstop against near-random retrieval. Testing showed a single
-   cutoff can't separate answerable from unanswerable cleanly, hence two nets.
+7. **Two anti-hallucination nets** — a confidence floor (abstain when the top
+   reranker probability is below **0.10**) plus a strict grounded prompt (answer
+   only from the passages, else a fixed refusal). The reranker score is already a
+   0–1 probability, so it's used directly — an earlier bug double-applied a
+   sigmoid and crushed every score into [0.50, 0.73], which is why the floor used
+   to be set at 0.50 and looked ineffective. With that fixed, the floor cleanly
+   catches out-of-scope queries; the prompt covers the few cases whose scores
+   still overlap, hence two nets.
 8. **Conversation memory, kept stateless** — follow-ups work by having the *client*
    replay recent turns; the server stores nothing, preserving horizontal scaling.
 

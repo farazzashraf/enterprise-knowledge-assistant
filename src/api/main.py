@@ -66,7 +66,7 @@ class AskRequest(BaseModel):
 class AskResponse(BaseModel):
     answer: str = Field(..., description="Generated answer grounded in retrieved context")
     sources: List[Source] = Field(default_factory=list, description="Cited source documents")
-    confidence: float = Field(..., description="0-1 retrieval confidence (sigmoid of top rerank score)")
+    confidence: float = Field(..., description="0-1 retrieval confidence (top reranker probability)")
     # Extra (not in the brief example) — full context passages for UI inspection.
     context_used: List[Dict[str, Any]] = Field(default_factory=list)
 

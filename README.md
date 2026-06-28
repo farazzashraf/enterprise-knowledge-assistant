@@ -51,6 +51,62 @@ Documents (PDF/DOCX/TXT)                Live question + chat history
 
 ---
 
+## Architecture
+
+```
+                         ┌─────────────────────────────────────────────┐
+  INGESTION (offline)    │  ANSWERING (live, agentic)                  │
+  ingest_documents.py    │  src/pipeline.py · src/api/main.py          │
+                         │                                             │
+  PDF/DOCX/TXT           │   Streamlit UI (app.py)  ◀── employee       │
+      │ load (loaders)   │        │ question + chat history            │
+      ▼                  │        ▼                                    │
+  chunk (~600 tok)       │   FastAPI  /ask                             │
+      │ (chunker)        │        ▼                                    │
+      ▼                  │   Gemini agent ── "need the KB?" ──┐        │
+  embed (Gemini 768-d)   │        │ greeting               yes│        │
+      │ (embedder)       │        │ → reply directly          ▼        │
+      ▼                  │        │            search_knowledge_base   │
+  ┌───────────┐          │        │                    │ embed query  │
+  │  Qdrant   │◀─────────┼────────┼──── hybrid search ─┤              │
+  │ (dense)   │  index   │        │   (dense + BM25, RRF)              │
+  ├───────────┤          │        │            │                      │
+  │ BM25 .pkl │◀─────────┘        │            ▼                      │
+  └───────────┘                   │   cross-encoder rerank (top 5)    │
+                                  │            │                      │
+                                  │            ▼                      │
+                                  │   confidence floor (guardrail)    │
+                                  │            │                      │
+                                  │            ▼                      │
+                                  │   grounded answer + sources + conf│
+                                  └─────────────────────────────────────┘
+
+         Gemini API (embeddings + generation) ── over the network
+```
+
+A full, annotated **Mermaid diagram** (with the data-flow and component tables) is in
+[SYSTEM_ARCHITECTURE.md](SYSTEM_ARCHITECTURE.md) §2–§4.
+
+---
+
+## Technical decisions
+
+Key choices and the reasoning behind them (full rationale in
+[SYSTEM_ARCHITECTURE.md](SYSTEM_ARCHITECTURE.md) §9):
+
+| Decision | Why |
+|---|---|
+| **Hybrid retrieval (dense + BM25, fused with RRF)** | Semantic search misses exact acronyms/IDs; keyword search misses paraphrases. RRF merges them without reconciling two incompatible score scales. |
+| **Cross-encoder re-ranking** (`bge-reranker-base`) | Biggest accuracy boost — it reads question + passage *together*. Runs only on the ~10 fused candidates, so cost stays flat as the corpus grows. Local & free. |
+| **Agentic tool use over a fixed RAG chain** | The LLM decides whether to search, so greetings/small talk skip retrieval (no pointless search, no false refusal) and the model can rewrite the query. Native `google-genai` function calling, no LangChain. Trade-off: ~2 model calls per factual question. |
+| **Two anti-hallucination nets** | A deterministic confidence floor (top reranker probability < `0.10` → abstain) plus a strict grounded-only prompt. Neither alone separates answerable from out-of-scope cleanly, so both run; abstention is credited if either fires. |
+| **Token-based chunking (~600 tokens)** | The embedder has a *token* limit, so tokens (tiktoken `cl100k_base`) track it far better than characters — especially for dense content like tables. |
+| **Gemini embeddings with task prefixes + L2-norm** | `gemini-embedding-2` ignores `task_type`, so intent is steered via instruction prefixes; the 768-dim (truncated MRL) vectors are L2-normalized for correct cosine search. |
+| **Stateless server, client-held history** | Conversation memory is replayed by the client per request, so the API stores nothing and scales horizontally. |
+| **Qdrant for vectors, FastAPI + Streamlit, Docker Compose** | Fast disk-backed vector search with a managed-cloud option; a modern auto-documented API; a quick clean UI; one-command startup. |
+
+---
+
 ## Prerequisites
 - **Python 3.11+** and **Docker Desktop** (for Qdrant and/or the full stack)
 - A **Gemini API key** → https://aistudio.google.com/apikey
@@ -148,9 +204,10 @@ The system is correct but has a few **one-time** and **inherent** costs worth kn
   "context_used": [ /* the passages used, for inspection */ ]
 }
 ```
-`confidence` is the sigmoid of the top cross-encoder score. If a search ran but scored below
-`CONFIDENCE_THRESHOLD` (default 0.50), the API abstains with the standard *"I don't have enough
-information…"* message and empty `sources`. Greetings return `confidence: 1.0` and no sources.
+`confidence` is the top cross-encoder relevance probability (0–1; `bge-reranker` already applies
+the sigmoid). If a search ran but scored below `CONFIDENCE_THRESHOLD` (default 0.10), the API
+abstains with the standard *"I don't have enough information…"* message and empty `sources`.
+Greetings return `confidence: 1.0` and no sources.
 
 ### Other endpoints
 - `POST /search` — hybrid search + rerank only (no answer); handy for debugging.
@@ -218,7 +275,7 @@ anthrasync/
 | `QDRANT_URL` | `http://localhost:6333` | Qdrant endpoint (Compose overrides to `qdrant:6333`). |
 | `QDRANT_API_KEY` | _(empty)_ | Only needed for Qdrant Cloud. |
 | `CHUNK_SIZE` / `CHUNK_OVERLAP` | `600` / `0.15` | Chunk size in **tokens** / overlap fraction. |
-| `CONFIDENCE_THRESHOLD` | `0.50` | Backstop floor for abstaining. |
+| `CONFIDENCE_THRESHOLD` | `0.10` | Floor on the top reranker probability; abstains below it. |
 | `RERANKER_MODEL` | `BAAI/bge-reranker-base` | Cross-encoder model. |
 | `FEEDBACK_LOG_PATH` | `data/feedback.jsonl` | Where 👍/👎 feedback is stored. |
 
@@ -229,6 +286,17 @@ anthrasync/
 - **Memory is per-session & client-held** — capped to recent turns; not persisted server-side.
 - **Text-file page numbers are approximate** (PDFs are exact).
 - **No authentication** — the API is open; add a key/login before public exposure.
+- **In-memory BM25 index** — fine for thousands of chunks; needs a dedicated store at much larger scale.
+
+---
+
+## Future improvements
+- **Persistent, server-side conversation memory** — beyond the current client-held history, so long sessions don't forget early turns.
+- **Close the feedback loop** — use the collected 👍/👎 (`data/feedback.jsonl`) to tune retrieval and prompts.
+- **More agent tools** — e.g. separate HR vs. compliance indexes, a calculator, or document-scoped search.
+- **Move keyword search into Qdrant** — drop the in-memory BM25 `.pkl` for a single scalable store.
+- **Auth & per-document access control** — logins and per-department permissions before public exposure.
+- **Production hosting** — managed Qdrant Cloud, horizontal API replicas, and a GPU for faster reranking.
 
 See [SYSTEM_ARCHITECTURE.md](SYSTEM_ARCHITECTURE.md) for the full design, scalability notes, and roadmap.
 

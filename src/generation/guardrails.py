@@ -1,14 +1,17 @@
 """
 Confidence scoring and hallucination guardrails for the RAG pipeline.
 
-The cross-encoder reranker emits an unbounded relevance *logit* per passage
-(roughly -11 .. +11 for bge-reranker-base). We squash the top passage's logit
-through a sigmoid to get a calibrated 0-1 confidence, then abstain when it falls
-below the configured floor -- this is what stops the LLM from answering on weak
-or empty context.
+`sentence_transformers.CrossEncoder.predict()` already applies a sigmoid for the
+single-label bge-reranker, so each passage's `rerank_score` is a calibrated 0-1
+relevance probability. Confidence is simply the top passage's score; we abstain
+when it falls below the configured floor -- this is what stops the LLM from
+answering on weak or empty context.
+
+(Historical note: an earlier version applied a *second* sigmoid here, which
+crushed every score into [0.50, 0.73] and destroyed the in/out-of-scope signal.
+The reranker probability is used directly now.)
 """
 
-import math
 from typing import List, Dict, Any, Tuple
 
 ABSTAIN_MESSAGE = (
@@ -16,24 +19,17 @@ ABSTAIN_MESSAGE = (
 )
 
 
-def sigmoid(x: float) -> float:
-    """Numerically stable logistic squashing of a reranker logit into 0-1."""
-    if x >= 0:
-        return 1.0 / (1.0 + math.exp(-x))
-    z = math.exp(x)
-    return z / (1.0 + z)
-
-
 def compute_confidence(results: List[Dict[str, Any]]) -> float:
     """
-    Confidence = sigmoid(highest rerank logit among the retrieved passages).
+    Confidence = highest reranker probability among the retrieved passages.
 
-    Returns 0.0 when there is nothing to score.
+    `rerank_score` is already a 0-1 probability (CrossEncoder.predict applies a
+    sigmoid for the 1-label bge-reranker), so we use it directly -- do NOT squash
+    it again. Returns 0.0 when there is nothing to score.
     """
     if not results:
         return 0.0
-    top_score = max(float(r.get("rerank_score", 0.0)) for r in results)
-    return round(sigmoid(top_score), 4)
+    return round(max(float(r.get("rerank_score", 0.0)) for r in results), 4)
 
 
 def passes_floor(confidence: float, threshold: float) -> bool:

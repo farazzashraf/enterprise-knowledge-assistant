@@ -28,10 +28,11 @@ class Settings(BaseSettings):
     chunk_overlap: float = 0.15    # fraction of chunk_size to overlap (15%)
     top_k_retrieval: int = 20      # candidates from hybrid search
     top_k_rerank: int = 5          # final passages after reranking
-    # Layer 1 guard: a low floor that only catches empty/near-random retrieval.
-    # Semantic out-of-scope is handled by the LLM's grounded-refusal prompt (layer 2),
-    # because cross-encoder confidence overlaps for in/out-of-scope on this corpus.
-    confidence_threshold: float = 0.50
+    # Layer 1 guard: abstain when the top reranker probability (0-1, see
+    # guardrails.compute_confidence) falls below this floor. 0.10 cleanly catches
+    # out-of-scope / near-random retrieval; the LLM's grounded-refusal prompt
+    # (layer 2) backs it up on the few cases whose scores still overlap.
+    confidence_threshold: float = 0.10
 
     # ── Reranking ───────────────────────────────────────────────
     use_reranker: bool = True
