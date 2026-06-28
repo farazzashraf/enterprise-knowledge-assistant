@@ -139,16 +139,16 @@ def _typewriter(text: str) -> None:
     placeholder.markdown(text)
 
 
-def _confidence_chip(confidence: float) -> str:
-    """Color-coded confidence badge (only shown for grounded answers)."""
-    pct = int(round(confidence * 100))
-    if confidence >= 0.7:
-        cls, label = "conf-high", "High"
-    elif confidence >= 0.4:
-        cls, label = "conf-med", "Medium"
-    else:
-        cls, label = "conf-low", "Low"
-    return f"<span class='conf-chip {cls}'>Confidence: {label} · {pct}%</span>"
+# def _confidence_chip(confidence: float) -> str:
+#     """Color-coded confidence badge (only shown for grounded answers)."""
+#     pct = int(round(confidence * 100))
+#     if confidence >= 0.7:
+#         cls, label = "conf-high", "High"
+#     elif confidence >= 0.4:
+#         cls, label = "conf-med", "Medium"
+#     else:
+#         cls, label = "conf-low", "Low"
+#     return f"<span class='conf-chip {cls}'>Confidence: {label} · {pct}%</span>"
 
 
 def render_answer(
@@ -163,8 +163,8 @@ def render_answer(
 
     sources = data.get("sources", [])
     # Confidence chip only when the answer is grounded in sources.
-    if sources and isinstance(data.get("confidence"), (int, float)):
-        st.markdown(_confidence_chip(float(data["confidence"])), unsafe_allow_html=True)
+    # if sources and isinstance(data.get("confidence"), (int, float)):
+    #     st.markdown(_confidence_chip(float(data["confidence"])), unsafe_allow_html=True)
 
     if sources:
         unique_sources = list(
