@@ -163,7 +163,7 @@ streamlit run app.py                             # http://localhost:8501
 
 ---
 
-## ⏱️ Why is it slow? (expected, and how to speed it up)
+## ⏱️ If it is slow? (expected, and how to speed it up)
 
 The system is correct but has a few **one-time** and **inherent** costs worth knowing:
 
